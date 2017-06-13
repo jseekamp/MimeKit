@@ -130,7 +130,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException (nameof (entity));
 
-			entity.Prepare (EncodingConstraint.SevenBit, 78);
+			entity.Prepare (EncodingConstraint.SevenBit, 998);
 
 			using (var memory = new MemoryBlockStream ()) {
 				using (var filtered = new FilteredStream (memory)) {
@@ -216,7 +216,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException (nameof (entity));
 
-			entity.Prepare (EncodingConstraint.SevenBit, 78);
+			entity.Prepare (EncodingConstraint.SevenBit, 998);
 
 			using (var memory = new MemoryBlockStream ()) {
 				using (var filtered = new FilteredStream (memory)) {
@@ -330,7 +330,7 @@ namespace MimeKit.Cryptography {
 			if (entity == null)
 				throw new ArgumentNullException (nameof (entity));
 
-			entity.Prepare (EncodingConstraint.SevenBit, 78);
+			entity.Prepare (EncodingConstraint.SevenBit, 998);
 
 			using (var memory = new MemoryBlockStream ()) {
 				using (var filtered = new FilteredStream (memory)) {

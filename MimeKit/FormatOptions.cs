@@ -68,7 +68,7 @@ namespace MimeKit {
 		internal const int MaximumLineLength = 998;
 		internal const int MinimumLineLength = 60;
 
-		const int DefaultMaxLineLength = 78;
+		const int DefaultMaxLineLength = 998;
 
 		ParameterEncodingMethod parameterEncodingMethod;
 		bool allowMixedHeaderCharsets;
