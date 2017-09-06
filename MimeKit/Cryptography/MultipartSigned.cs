@@ -30,6 +30,7 @@ using Org.BouncyCastle.Bcpg.OpenPgp;
 
 using MimeKit.IO;
 using MimeKit.IO.Filters;
+using System.IO;
 
 namespace MimeKit.Cryptography {
 	/// <summary>
@@ -433,6 +434,7 @@ namespace MimeKit.Cryptography {
 		/// </remarks>
 		/// <returns>A signer info collection.</returns>
 		/// <param name="ctx">The cryptography context to use for verifying the signature.</param>
+        /// <param name="clearTextBufferStream">The stream buffer to use for the clear text part of the multipart during verification</param>
 		/// <exception cref="System.ArgumentNullException">
 		/// <paramref name="ctx"/> is <c>null</c>.
 		/// </exception>
@@ -445,7 +447,7 @@ namespace MimeKit.Cryptography {
 		/// <exception cref="Org.BouncyCastle.Cms.CmsException">
 		/// An error occurred in the cryptographic message syntax subsystem.
 		/// </exception>
-		public DigitalSignatureCollection Verify (CryptographyContext ctx)
+		public DigitalSignatureCollection Verify (CryptographyContext ctx, Stream clearTextBufferStream)
 		{
 			if (ctx == null)
 				throw new ArgumentNullException (nameof (ctx));
@@ -473,18 +475,44 @@ namespace MimeKit.Cryptography {
 				signature.ContentObject.DecodeTo (signatureData);
 				signatureData.Position = 0;
 
-				using (var cleartext = new MemoryBlockStream ()) {
-					// Note: see rfc2015 or rfc3156, section 5.1
-					var options = FormatOptions.CloneDefault ();
-					options.NewLineFormat = NewLineFormat.Dos;
+				
+                // Note: see rfc2015 or rfc3156, section 5.1
+                var options = FormatOptions.CloneDefault ();
+                options.NewLineFormat = NewLineFormat.Dos;
 
-					this[0].WriteTo (options, cleartext);
-					cleartext.Position = 0;
+                this[0].WriteTo (options, clearTextBufferStream);
+                clearTextBufferStream.Position = 0;
 
-					return ctx.Verify (cleartext, signatureData);
-				}
+                return ctx.Verify (clearTextBufferStream, signatureData);
 			}
 		}
+
+        /// <summary>
+        /// Verifies the multipart/signed part.
+        /// </summary>
+        /// <remarks>
+        /// Verifies the multipart/signed part using the supplied cryptography context.
+        /// </remarks>
+        /// <returns>A signer info collection.</returns>
+        /// <param name="ctx">The cryptography context to use for verifying the signature.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name="ctx"/> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="System.FormatException">
+        /// The multipart is malformed in some way.
+        /// </exception>
+        /// <exception cref="System.NotSupportedException">
+        /// <paramref name="ctx"/> does not support verifying the signature part.
+        /// </exception>
+        /// <exception cref="Org.BouncyCastle.Cms.CmsException">
+        /// An error occurred in the cryptographic message syntax subsystem.
+        /// </exception>
+        public DigitalSignatureCollection Verify (CryptographyContext ctx)
+        {
+            using (var cleartext = new MemoryBlockStream()) {
+                return Verify(ctx, cleartext);
+            }
+        }
 
 		/// <summary>
 		/// Verifies the multipart/signed part.
